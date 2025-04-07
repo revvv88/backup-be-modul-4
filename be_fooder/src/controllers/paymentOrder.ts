@@ -31,7 +31,7 @@ export const getAllPayOrder = async (request: Request, response: Response) => {
 export const createPayOrder = async (request: Request, response: Response) => {
   try {
     /** get requested data (data has been sent from request) */
-    const { id_order, id_method, uang_masuk, status } = request.body;
+    const { id_order, uang_masuk, status } = request.body;
     /** variable filename use to define of uploaded file name */
 
     /** process to save new menu, price and stock have to convert in number type */

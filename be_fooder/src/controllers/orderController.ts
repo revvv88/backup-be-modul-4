@@ -15,7 +15,7 @@ export const getAllOrders = async (request: Request, response: Response) => {
                     { customer: { contains: search?.toString() || "" } },
                 ]
             },
-            orderBy: { createdAt: "desc" }, /** sort by descending order date */
+            orderBy: { createdAt: "desc" }, 
             include: { 
                 user: true,
                 orderlist: {
@@ -67,7 +67,7 @@ export const createOrder = async (request: Request, response: Response) => {
 
         /** process to save new order */
         const newOrder = await prisma.order.create({
-            data: { uuid, customer, table_number, total_price,  note, dine_in : parseInt(dine_in), status:"NEW", userId: user.id }
+            data: { uuid, customer, table_number:parseInt(table_number), total_price,  note, dine_in : parseInt(dine_in), status:"NEW", userId: user.id }
         })
         // NOTE BELUM
         /** loop details of Order to save in database */

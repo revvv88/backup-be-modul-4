@@ -3,7 +3,7 @@ import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient({ errorFormat: "pretty" });
 
-/** ✅ Get All Meja */
+
 export const getAllMeja = async (request: Request, response: Response) => {
   try {
     const allMeja = await prisma.nomormeja.findMany();
@@ -20,7 +20,7 @@ export const getAllMeja = async (request: Request, response: Response) => {
   }
 };
 
-/** ✅ Create Meja */
+
 export const createMeja = async (request: Request, response: Response) => {
   try {
     const { nomor } = request.body;
@@ -31,7 +31,6 @@ export const createMeja = async (request: Request, response: Response) => {
           });
     }
 
-    // Cek apakah nomor sudah ada
     const existingMeja = await prisma.nomormeja.findUnique({ where: { nomor } });
     if (existingMeja) {
       return response.status(400).json({
@@ -57,7 +56,6 @@ export const createMeja = async (request: Request, response: Response) => {
   }
 };
 
-/** ✅ Update Meja */
 export const updateMeja = async (request: Request, response: Response) => {
   try {
     const { id } = request.params;
@@ -89,7 +87,6 @@ export const updateMeja = async (request: Request, response: Response) => {
   }
 };
 
-/** ✅ Delete Meja */
 export const deleteMeja = async (request: Request, response: Response) => {
   try {
     const { id } = request.params;

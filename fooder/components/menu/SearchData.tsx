@@ -22,8 +22,8 @@ const Search = ({ url, search }: Props) => {
       id="keyword"
       value={keyword}
       onChange={(e) => setKeyword(e.target.value)}
-      className={`text-md w-full rounded-lg p-2 bg-[#f7f7f7] border border-secondary focus:border-primary focus:outline-none`}
-      placeholder="Search"
+      className={`text-md w-full rounded-lg p-2 bg-[#ffffff] border border-secondary focus:border-primary focus:outline-none`}
+      placeholder="Search Menu"
       onKeyUp={handleSearch}
     />
   );

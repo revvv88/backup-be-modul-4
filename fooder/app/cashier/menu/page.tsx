@@ -6,7 +6,7 @@ import { BASE_API_URL, BASE_IMAGE_MENU } from "@/global";
 import { get } from "@/lib/api-bridge";
 import Alert from "../../../components/alert/page";
 import Image from "next/image";
-import Search from "../../../components/menu/Search";
+import Search from "../../../components/menu/SearchData";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import AddMenu from "../../../components/menu/AddMenu";
@@ -41,8 +41,8 @@ const MenuPage = () => {
   const category = (category: string): React.ReactNode => {
     const categories = {
       FOOD: "bg-blue-100 text-blue-800",
-      SNACK: "bg-indigo-100 text-indigo-800",
-      DRINK: "bg-purple-100 text-purple-800",
+      SNACK: "bg-red-100 text-red-800",
+      DRINK: "bg-green-100 text-green-800",
     };
     return (
       <span className={`${categories[category] || "bg-gray-100 text-gray-800"} text-sm font-medium px-3 py-1 rounded-full`}>{category}</span>
@@ -57,7 +57,7 @@ const MenuPage = () => {
       </p>
 
       {/* Search Bar */}
-      <div className="flex justify-between mb-6">
+      <div className="flex gap-3 mb-6">
         <Search url={`/cashier/menu`} search={search} className="w-[90%] mr-2" />
         <AddMenu className="ml-4" />
       </div>

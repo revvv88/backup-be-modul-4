@@ -6,7 +6,7 @@ import { BASE_API_URL, BASE_IMAGE_PROFILE } from "@/global";
 import { get } from "@/lib/api-bridge";
 import Alert from "../../../components/alert/page";
 import Image from "next/image";
-import Search from "../../../components/menu/Search";
+import Search from "../../../components/menu/SearchData";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import AddUser from "@/components/user/AddUser";
@@ -64,8 +64,6 @@ const UserPage = () => {
         This page displays uiser data, allowing user to view details, search,
         and manage user items by adding, editing, or deleting them.
       </p>
-
-      {/* Search Bar */}
       <div className="flex justify-between items-center mb-4">
         <div className="flex items-center w-full max-w-md flex-grow">
           <Search url={`/manager/user`} search={search} />

@@ -40,7 +40,7 @@ export default function Details() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
 
-  useEffect(() => { 
+  useEffect(() => {
     const fetchData = async () => {
       if (id) {
         const result = await getOrder(id);

@@ -6,7 +6,7 @@ import { BASE_API_URL, BASE_IMAGE_PROFILE } from "@/global";
 import { get } from "@/lib/api-bridge";
 import Alert from "../../../components/alert/page";
 import Image from "next/image";
-import Search from "../../../components/menu/Search";
+import Search from "../../../components/menu/SearchData";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import AddUser from "@/components/user/AddUser";

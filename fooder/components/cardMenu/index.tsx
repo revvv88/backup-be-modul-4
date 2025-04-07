@@ -14,11 +14,33 @@ export default function Test({
     orderClick({ id, title, image, price });
   };
 
+  const category = (category: string): React.ReactNode => {
+    const categories = {
+      FOOD: "bg-blue-100 text-blue-800",
+      SNACK: "bg-red-100 text-red-800",
+      DRINK: "bg-green-100 text-green-800",
+    };
+    return (
+      <span className={`${categories[category] || "bg-gray-100 text-gray-800"} text-sm font-medium px-3 py-1 rounded-full`}>
+        {category}
+      </span>
+    );
+  };
+
+  const rupiah = (amount:number)=>{
+    return new Intl.NumberFormat("id-ID", {
+      style: "currency",
+      currency: "IDR",
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(amount);
+  }
+
   return (
     <div className="text-hitamGaHitam font-poppins">
-      <div className="bg-[#ffffff] flex flex-col rounded-lg py-3 overflow-hidden shadow-md w-48 min-h-[250px]">
-        <div className=" flex flex-col h-full">
-          <div className="rounded-lg w-40 h-36  overflow-hidden relative mx-auto bg-[#F7F7F7]">
+      <div className="bg-[#ffffff] flex flex-col rounded-lg py-3 overflow-hidden shadow-md w-52 min-h-[250px]">
+        <div className="flex flex-col h-full">
+          <div className="rounded-lg w-36 h-32 overflow-hidden relative mx-auto bg-[#F7F7F7]">
             <Image
               src={image ? `${BASE_IMAGE_MENU}/${image}` : "/menu/menu1.jpg"}
               alt="makanan"
@@ -32,17 +54,15 @@ export default function Test({
             <h1 className="capitalize text-lg">{title}</h1>
 
             <div className="flex justify-between gap-2 mt-2">
-              <p className="bg-orange-500/30 text-orange-500 text-xs px-2.5 py-1 rounded-full capitalize h-max">
-                {cat}
-              </p>
-              <h1 className="text-gray-700 text-lg">Rp.{price}</h1>
+              {category(cat)}
+              <h1 className="text-gray-700 text-lg">{rupiah(price)}</h1>
             </div>
           </div>
 
           <div className="w-full flex justify-end mt-4 px-3">
             <button
               className="bg-orange-500 text-white px-4 py-2 rounded-lg shadow-md"
-              onClick={() => clickOrder()}
+              onClick={clickOrder}
             >
               Order
             </button>
