@@ -40,7 +40,7 @@ const EditUser = ({ selectedUser }: { selectedUser: IUser }) => {
       payload.append("name", name || "");
       payload.append("email", email || "");
       payload.append("password", password || "");
-      if (file !== null) payload.append("picture", file || "");
+      if (file !== null) payload.append("profil_picture", file || "");
       const { data } = await put(url, payload, TOKEN);
       if (data?.status) {
         setIsShow(false);
@@ -86,16 +86,16 @@ const EditUser = ({ selectedUser }: { selectedUser: IUser }) => {
         </svg>
       </ButtonInfo>
       <Modal isShow={isShow} onClose={(state) => setIsShow(state)}>
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} className="font-poppins">
           {/* modal header */}
           <div className="sticky top-0 bg-white px-5 pt-5 pb-3 shadow">
             <div className="w-full flex items-center">
               <div className="flex flex-col">
                 <strong className="font-bold text-2xl">Update User</strong>
-                <small className="text-slate-400 text-sm">
+                {/* <small className="text-slate-400 text-sm">
                   Managers can update both Cashier and Manager roles on this
                   page.
-                </small>
+                </small> */}
               </div>
               <div className="ml-auto">
                 <button

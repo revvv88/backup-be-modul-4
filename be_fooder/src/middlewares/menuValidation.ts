@@ -5,7 +5,7 @@ import Joi from 'joi'
 const addDataSchema = Joi.object({
     name: Joi.string().required(),
     price: Joi.number().min(0).required(),
-    category: Joi.string().valid('FOOD','DRINK','SNACK').uppercase().required(),
+    category: Joi.string().required(),
     description: Joi.string().required(),
     picture: Joi.allow().optional(),
     user: Joi.optional()
@@ -15,7 +15,7 @@ const addDataSchema = Joi.object({
 const editDataSchema = Joi.object({
     name: Joi.string().optional(),
     price: Joi.number().min(0).optional(),
-    category: Joi.string().valid('FOOD','DRINK','SNACK').uppercase().optional(),
+    category: Joi.string().optional(),
     description: Joi.string().optional(),
     picture: Joi.allow().optional(),
     user: Joi.optional()

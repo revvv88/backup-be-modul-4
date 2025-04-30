@@ -3,18 +3,19 @@ import { BASE_API_URL } from "@/global";
 import { getCookies } from "@/lib/server-cookies";
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
-import { iOrder, IPayMethod } from "@/app/types";
+import { iOrder, IPayMethod, IMenu } from "@/app/types";
 import { get, put } from "@/lib/api-bridge";
 import { generatorString } from "@/lib/utils";
 import { useRouter } from "next/navigation";
-
+import { IoChevronBackOutline } from "react-icons/io5";
+import Swal from "sweetalert2";
 
 const getOrder = async (id: string): Promise<iOrder | null> => {
   try {
     const TOKEN = (await getCookies("token")) ?? "";
     const url = `${BASE_API_URL}/order/${id}`;
     const { data } = await get(url, TOKEN);
-    
+
     if (data?.status) return data.data;
     return null;
   } catch (error) {
@@ -55,7 +56,7 @@ export default function PaymentPage() {
   const [defaultVaNumber, setdefaultVaNumber] = useState(generatorString(16));
   const [showInputCard, setShowInputcard] = useState(false);
 
-  const router = useRouter()
+  const router = useRouter();
 
   const paymentMethods = [
     { id: "cash", label: "Cash" },
@@ -77,8 +78,8 @@ export default function PaymentPage() {
   }, [id]);
 
   const payOrder = async () => {
-    console.log('selectedMethod');
-    
+    console.log("selectedMethod");
+
     try {
       const TOKEN = (await getCookies("token")) ?? "";
 
@@ -86,7 +87,7 @@ export default function PaymentPage() {
       const payload: any = {
         status: "LUNAS",
         email,
-        id_method:selectedWallet === 0 ? 1 :selectedWallet
+        id_method: selectedWallet === 0 ? 1 : selectedWallet,
       };
 
       if (selectedMethod === "cash") {
@@ -111,13 +112,31 @@ export default function PaymentPage() {
       if (data?.status) {
         const urlUpdate = `${BASE_API_URL}/order/${id}`;
         const payloadUpdate: any = {
-          status: "PAID"
+          status: "PAID",
         };
         const jsonPayloadUpdate = JSON.stringify(payloadUpdate);
 
         const res = await put(urlUpdate, jsonPayloadUpdate, TOKEN);
         if (res.data.status) {
-           router.push("/cashier/transaksi"  );
+          // router.push("/cashier/transaksi");
+          Swal.fire({
+            title: "Success",
+            text: "You won't be able to revert this!",
+            icon: "success",
+            showCancelButton: false,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Ok"
+          }).then((result) => {
+            if (result.isConfirmed) {
+              // Swal.fire({
+              //   title: "Deleted!",
+              //   text: "Your file has been deleted.",
+              //   icon: "success"
+              // });
+              router.push("/cashier/transaksi");
+            }
+          });
         }
         //  router.push('/cashier/payment/' + id);
       } else {
@@ -172,9 +191,15 @@ export default function PaymentPage() {
 
   return (
     <div className="flex bg-white h-screen w-screen font-poppins">
-      <div className="basis-2/3  px-20 py-10  flex flex-col">
+      <div className="my-6 flex ml-8 cursor-pointer h-fit items-center hover:opacity-70 transition-all">
+        <IoChevronBackOutline size={24} />
+        <button className="text-lg" onClick={() => history.back()}>
+          Back
+        </button>
+      </div>
+      <div className="basis-2/3  pl-5 pr-16 py-20  flex flex-col">
         <h1 className="text-4xl font-semibold">Payment details</h1>
-        <label htmlFor="" className="mt-6">
+        <label htmlFor="" className="mt-6" typeof="email">
           Email address
         </label>
         <input
@@ -263,7 +288,7 @@ export default function PaymentPage() {
               type="number"
               placeholder="Enter cash amount"
               className="mt-4 p-2 border rounded w-full"
-              onChange={(e)=> setCashAmount(e.target.value) }
+              onChange={(e) => setCashAmount(e.target.value)}
             />
           )}
 
@@ -356,23 +381,58 @@ export default function PaymentPage() {
         </button>
       </div>
       <div className="basis-1/2 p-4 h-screen w-full">
-        <div className="bg-[#f7f7f7] p-10 rounded-lg w-full h-full">
-          <div className="flex flex-col items-center">
-            <h1 className="text-lg">Total Amount</h1>
-            <h1 className="text-5xl font-bold my-3">Rp.{order?.total_price}</h1>
-          </div>
-          <div className="flex flex-col px-8 my-8">
-            <p className="text-sm">Order Summary </p>
-            <div className="flex justify-between mt-2">
-              <p>food name</p>
-              <p>price</p>
-            </div>
-          </div>
-          <div className="flex justify-between px-8">
-            <h1>Total</h1>
-            <h1>price</h1>
-          </div>
+      <div className="bg-[#f7f7f7] p-10 rounded-lg w-full h-full shadow-md">
+  {/* total */}
+  <div className="flex flex-col items-center">
+    <h2 className="text-xl font-semibold text-gray-700">Total Amount</h2>
+    <h1 className="text-5xl font-bold text-primary my-3">
+      Rp. {order?.total_price.toLocaleString()}
+    </h1>
+  </div>
+
+  {/* order summary */}
+  <div className="px-4 my-8">
+    <h2 className="text-center text-2xl font-bold mb-10 text-gray-800">
+      Order Summary
+    </h2>
+
+    {/* header */}
+    <div className="grid grid-cols-4 text-sm font-semibold border-b pb-2 text-gray-600">
+      <p className="col-span-1">Menu</p>
+      <p className="col-span-1 text-center">Qty</p>
+      <p className="col-span-1 text-center">Price</p>
+      <p className="col-span-1 text-right">Subtotal</p>
+    </div>
+
+    {/* item list */}
+    <div className="mt-3 space-y-3 text-sm text-gray-700">
+      {order?.orderlist?.map((item) => (
+        <div
+          key={item.id}
+          className="grid grid-cols-4 items-center"
+        >
+          <p className="col-span-1 capitalize">{item.menu.name}</p>
+          <p className="col-span-1 text-center">x{item.quantity}</p>
+          <p className="col-span-1 text-center">Rp. {item.menu.price.toLocaleString()}</p>
+          <p className="col-span-1 text-right">
+            Rp. {(item.menu.price * item.quantity).toLocaleString()}
+          </p>
         </div>
+      ))}
+    </div>
+  </div>
+
+  {/* total */}
+  <div className="grid grid-cols-4 border-t pt-4 px-4 text-gray-800">
+    <div className="col-span-3 text-right text-lg font-semibold">Total</div>
+    <div className="col-span-1 text-right text-lg font-bold text-primary">
+      Rp. {order?.total_price.toLocaleString()}
+    </div>
+  </div>
+</div>
+
+
+
       </div>
     </div>
   );

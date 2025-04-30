@@ -9,16 +9,39 @@ const prisma = new PrismaClient({ errorFormat: "pretty" })
 export const getAllMenus = async (request: Request, response: Response) => {
     try {
         /** get requested data (data has been sent from request) */
-        const { search } = request.query
+        const { search, category } = request.query
 
         /** process to get menu, contains means search name of menu based on sent keyword */
-        const allMenus = await prisma.menu.findMany({
-            where: { name: { contains: search?.toString() || "" } }
-        })
+        const filters = [];
 
+    // Filter berdasarkan nama menu
+    filters.push({
+      name: {
+        contains: search?.toString() || "",
+      },
+    });
+
+    // Jika categoryKeyword bukan "all", tambahkan filter kategori
+    if (category && category !== "all") {
+      filters.push({
+        id_category: parseInt(category.toString()),
+      });
+    }
+
+    const allMenus = await prisma.menu.findMany({
+      where: {
+        AND: filters,
+      },
+      include: {
+        category: true,     
+      },
+    });
+    const totalMenus = await prisma.menu.count({});
+      
         return response.json({
             status: true,
             data: allMenus,
+            totalMenus,
             message: `Menus has retrieved`
         }).status(200)
     } catch (error) {
@@ -43,7 +66,7 @@ export const createMenu = async (request: Request, response: Response) => {
 
         /** process to save new menu, price and stock have to convert in number type */
         const newMenu = await prisma.menu.create({
-            data: { uuid, name, price: Number(price), category, description, picture: filename }
+            data: { uuid, name, price: Number(price), id_category:parseInt(category), description, picture: filename }
         })
 
         return response.json({
@@ -91,7 +114,7 @@ export const updateMenu = async (request: Request, response: Response) => {
             data: {
                 name: name || findMenu.name,
                 price: price ? Number(price) : findMenu.price,
-                category: category || findMenu.category,
+                id_category: parseInt(category) || findMenu.id_category,
                 description: description || findMenu.description,
                 picture: filename
             },

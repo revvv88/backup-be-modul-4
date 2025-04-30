@@ -11,6 +11,8 @@ import ReportRoute from './routers/reportRoute'
 import MethodRoute from './routers/methodRoute'
 import PayOrderRoute from './routers/orderPayRoute'
 import NomorMejaRoute from './routers/nomorMejaRoute'
+import CategoryRoute from './routers/categoryRoute'
+import StatistikRoute from './routers/statistikRoute'
 
 
 import { PORT } from './global'
@@ -56,6 +58,9 @@ app.use(`/report`, ReportRoute)
 app.use(`/pay-method`, MethodRoute)
 app.use(`/pay-order`, PayOrderRoute)
 app.use(`/no-meja`, NomorMejaRoute)
+app.use(`/category`, CategoryRoute)
+app.use(`/statistik`, StatistikRoute)
+
 
 // Set public folder as static
 app.use(express.static(path.join(__dirname, '..', 'public')));

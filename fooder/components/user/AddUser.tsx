@@ -27,7 +27,7 @@ const AddUser = () => {
     email: ``,
     password: ``,
     role: ``,
-    profil_picture: ``,
+    profile_picture: ``,
     createdAt: ``,
     updatedAt: ``,
   });
@@ -45,7 +45,7 @@ const AddUser = () => {
       email: ``,
       password: ``,
       role: ``,
-      profil_picture: ``,
+      profile_picture: ``,
       createdAt: ``,
       updatedAt: ``,
     });
@@ -89,10 +89,10 @@ const AddUser = () => {
     }
   };
   return (
-    <div>
+    <div className="font-poppins">
       <ToastContainer containerId={`toastUser`} />
       <ButtonSuccess type="button" onClick={() => openModal()}>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 w-fit">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
@@ -107,7 +107,10 @@ const AddUser = () => {
               d="M12 4.5v15m7.5-7.5h-15"
             />
           </svg>
+          <p className="font-semibold">
+
           Add User
+          </p>
         </div>
       </ButtonSuccess>
       <Modal isShow={isShow} onClose={(state) => setIsShow(state)}>

@@ -38,6 +38,7 @@ export default function TestPage() {
         storeCookie("id", data.data.id);
         storeCookie("name", data.data.name);
         storeCookie("role", data.data.role);
+        storeCookie("image", data.data.profile_picture)
         let role = data.data.role;
         if (role === `MANAGER`)
           setTimeout(() => router.push(`/manager/dashboard`), 1000);

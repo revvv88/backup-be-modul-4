@@ -1,11 +1,11 @@
 "use client";
 
-import { IMenu } from "@/app/types";
+import { iCategory, IMenu } from "@/app/types";
 import { BASE_API_URL } from "@/global";
 import { post } from "@/lib/api-bridge";
 import { getCookie } from "@/lib/client-cookies";
 import { useRouter } from "next/navigation";
-import { FormEvent, useRef, useState } from "react";
+import { FormEvent, useEffect, useRef, useState } from "react";
 import { toast, ToastContainer } from "react-toastify";
 import {
   ButtonPrimary,
@@ -16,9 +16,12 @@ import { InputGroupComponent } from "@/components/InputComponent";
 import Modal from "@/components/modal";
 import Select from "@/components/select";
 import FileInput from "@/components/fileInput";
+import { getCookies } from "@/lib/server-cookies";
+import { get } from "@/lib/api-bridge";
 
 const AddMenu = () => {
   const [isShow, setIsShow] = useState<boolean>(false);
+  const [categoryData, setCategoryData] = useState<iCategory[]>([]);
 
   const [menu, setMenu] = useState<IMenu>({
     id: 0,
@@ -26,11 +29,33 @@ const AddMenu = () => {
     name: ``,
     price: 0,
     description: ``,
-    category: ``,
+    id_category: 0,
     picture: ``,
     createdAt: ``,
     updatedAt: ``,
   });
+
+  const GetDataCategory = async (): Promise<iCategory[]> => {
+    try {
+      const TOKEN = (await getCookies("token")) ?? "";
+      const url = `${BASE_API_URL}/category/items`;
+      const { data } = await get(url, TOKEN);
+      let result: iCategory[] = [];
+      if (data?.status) result = [...data.data];
+      return result;
+    } catch (error) {
+      console.log(error);
+      return [];
+    }
+  };
+  useEffect(() => {
+    const fetchData = async () => {;
+      const resultDataCategory = await GetDataCategory();
+      setCategoryData(resultDataCategory);
+    };
+    fetchData();
+  }, []);
+
   const router = useRouter();
 
   const TOKEN = getCookie("token") || "";
@@ -44,7 +69,7 @@ const AddMenu = () => {
       name: ``,
       price: 0,
       description: ``,
-      category: ``,
+      id_category: 0,
       picture: ``,
       createdAt: ``,
       updatedAt: ``,
@@ -56,11 +81,11 @@ const AddMenu = () => {
     try {
       e.preventDefault();
       const url = `${BASE_API_URL}/menu`;
-      const { name, price, description, category } = menu;
+      const { name, price, description, id_category } = menu;
       const payload = new FormData();
       payload.append("name", name || "");
       payload.append("price", price !== undefined ? price.toString() : "0");
-      payload.append("category", category || "");
+      payload.append("category", id_category.toString() || '');
       payload.append("description", description || "");
       if (file !== null) payload.append("picture", file || "");
       const { data } = await post(url, payload, TOKEN);
@@ -178,15 +203,19 @@ const AddMenu = () => {
 
             <Select
               id={`category`}
-              value={menu.category}
+              value={menu.id_category.toString()}
               label="Category"
               required={true}
-              onChange={(val) => setMenu({ ...menu, category: val })}
+              onChange={(val) => setMenu({ ...menu, id_category: parseInt(val) })}
             >
               <option value="">--- Select Category ---</option>
-              <option value="FOOD">Food</option>
+              {/* <option value="FOOD">Food</option>
               <option value="SNACK">Snack</option>
-              <option value="DRINK">Drink</option>
+              <option value="DRINK">Drink</option> */}
+              {categoryData.map((category) => (
+              <option value={category.id} key={category.id}>{category.name}</option>
+                
+              ))}
             </Select>
 
             <FileInput

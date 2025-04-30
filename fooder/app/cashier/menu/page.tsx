@@ -40,12 +40,14 @@ const MenuPage = () => {
 
   const category = (category: string): React.ReactNode => {
     const categories = {
-      FOOD: "bg-blue-100 text-blue-800",
-      SNACK: "bg-red-100 text-red-800",
-      DRINK: "bg-green-100 text-green-800",
+      1: "bg-blue-100 text-blue-800",
+      2: "bg-red-100 text-red-800",
+      3: "bg-green-100 text-green-800",
     };
+    const randomnumber = Math.floor(Math.random() * 3) + 1;
+
     return (
-      <span className={`${categories[category] || "bg-gray-100 text-gray-800"} text-sm font-medium px-3 py-1 rounded-full`}>{category}</span>
+      <span className={`${categories[randomnumber]} text-sm font-medium px-3 py-1 rounded-full`}>{category}</span>
     );
   };
 
@@ -58,7 +60,10 @@ const MenuPage = () => {
 
       {/* Search Bar */}
       <div className="flex gap-3 mb-6">
-        <Search url={`/cashier/menu`} search={search} className="w-[90%] mr-2" />
+        <div className="w-[90%] mr-2">
+
+        <Search url={`/cashier/menu`} search={search}  />
+        </div>
         <AddMenu className="ml-4" />
       </div>
 
@@ -85,7 +90,7 @@ const MenuPage = () => {
                 <p className="text-lg font-medium text-gray-500 mb-2">{data.price}</p>
                 <p className="text-sm text-gray-700 line-clamp-2 capitalize">{data.description}</p>
                 <div className="flex items-center justify-between mt-2">
-                  {category(data.category)}
+                  {category(data.category ? data.category.name : '')}
                   <div className="flex gap-2">
                     <EditMenu selectedMenu={data} />
                     <DeleteMenu selectedMenu={data} />

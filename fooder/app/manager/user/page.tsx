@@ -31,6 +31,7 @@ const UserPage = () => {
   const searchParams = useSearchParams(); 
   const search = searchParams.get("search") || ""; 
   const [user, setUser] = useState<IUser[]>([]);
+  
 
   useEffect(() => {
     const fetchData = async () => {
@@ -43,14 +44,14 @@ const UserPage = () => {
   const role = (role: string): React.ReactNode => {
     if (role === "MANAGER") {
       return (
-        <span className="bg-blue-100 text-blue-800 text-sm font-medium px-2.5 py-0.5 rounded-full">
+        <span className="bg-orange-100 text-orange-800 text-sm font-medium px-2.5 py-0.5 rounded-full font-poppins">
           Manager
         </span>
       );
     }
     if (role === "CASHIER") {
       return (
-        <span className="bg-indigo-100 text-indigo-800 text-sm font-medium px-2.5 py-0.5 rounded-full">
+        <span className="bg-green-100 text-green-800 text-sm font-medium px-2.5 py-0.5 rounded-full font-poppins">
           Cashier
         </span>
       );
@@ -58,67 +59,82 @@ const UserPage = () => {
   };
 
   return (
-    <div className="m-2 bg-white rounded-lg p-3 border-t-4 border-t-primary shadow-md">
-      <h4 className="text-xl font-bold mb-2">Usre Data</h4>
-      <p className="text-sm text-secondary mb-4">
+    <div className="m-2 bg-white rounded-lg p-3 font-poppins">
+      <h4 className="text-2xl font-bold mt-4 mb-2 text-center">User Data</h4>
+      {/* <p className="text-sm text-secondary mb-4">
         This page displays uiser data, allowing user to view details, search,
         and manage user items by adding, editing, or deleting them.
-      </p>
+      </p> */}
       <div className="flex justify-between items-center mb-4">
         <div className="flex items-center w-full max-w-md flex-grow">
           <Search url={`/manager/user`} search={search} />
         </div>
+        <div className="w-fit">
         <AddUser />
+        </div>
       </div>
 
       {/* Alert jika data kosong */}
       {user.length === 0 ? (
         <Alert>No data available</Alert>
       ) : (
-        <div className="m-2">
+        <div className="my-2">
           {user.map((data, index) => (
             <div
               key={`keyPrestasi${index}`}
-              className="flex flex-wrap shadow m-2"
+              className="flex flex-wrap shadow my-2  w-full items-center"
             >
-              <div className="w-full md:w-1/12 p-2">
-                <small className="text-sm font-bold text-primary">
+              <div className="basis-1/6 py-4 px-16 ">
+                <h1 className="text-sm font-bold text-primary capitalize text-center mt-6">
                   Picture
-                </small>
+                </h1>
                 <br />
+                <div className="flex justify-center">
+
                 <Image
-                  width={40}
-                  height={40}
-                  src={`${BASE_IMAGE_PROFILE}/${data.profil_picture}`}
-                  className="rounded-sm overflow-hidden"
+                  width={54}
+                  height={54}
+                  src={`${BASE_IMAGE_PROFILE}/${data.profile_picture}`}
+                  className="rounded-full overflow-hidden mb-1"
                   alt="preview"
                   unoptimized
                 />
+                </div>
               </div>
 
-              <div className="w-full md:w-2/12 p-2">
-                <small className="text-sm font-bold text-primary">Name</small>
+              <div className="basis-1/6 py-4 px-16">
+                <h1 className="text-sm font-bold text-primary text-center capitalize mb-6x">Name</h1>
                 <br />
+                <p className="capitalize text-center  text-sm">
                 {data.name}
+                </p>
               </div>
 
-              <div className="w-full md:w-1/12 p-2">
-                <small className="text-sm font-bold text-primary">email</small>
-                <br />
+              <div className="basis-1/6 py-4 px-16">
+                <h1 className="text-sm font-bold text-primary  text-center capitalize">email</h1>
+                <br />  
+                <p className="text-center text-sm">
+                  
                 {data.email}
+                </p>
               </div>
 
-              <div className="w-full md:w-1/12 p-2">
-                <small className="text-sm font-bold text-primary">Role</small>
-                <br />
+              <div className="basis-1/6 py-4 px-16">
+                <h1 className="text-sm font-bold text-primary  text-center capitalize">Role</h1>
+                <br /> 
+                <p className="flex justify-center  text-sm">
+                  
                 {role(data.role)}
+                </p>
               </div>
 
-              <div className="w-full md:w-2/12 p-2">
-                <small className="text-sm font-bold text-primary">Action</small>
+              <div className="basis-1/6 py-4 pl-72">
+                <h1 className="text-sm font-bold text-primary text-center capitalize ">Action</h1>
                 <br />
+                <div className="flex justify-center">
                 <EditUser selectedUser={data}/>
                 <DeleteUser selectedUser={data}/>
+                </div>
               </div>
             </div>
           ))}

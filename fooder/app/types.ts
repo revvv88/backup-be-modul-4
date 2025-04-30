@@ -7,7 +7,8 @@ export interface IMenu {
   price: number;
   picture: string;
   description: string;
-  category: string;
+  category?: iCategory;
+  id_category: number;
   createdAt: string;
   updatedAt: string;
 }
@@ -18,7 +19,7 @@ export interface IUser {
   name: string;
   email: string;
   password: string;
-  profil_picture: string;
+  profile_picture: string;
   role: string;
   createdAt: string;
   updatedAt: string;
@@ -29,32 +30,37 @@ export interface IChart {
   title: string;
   price: number;
   image: string;
-  qty:number;
+  qty: number;
 }
 
-export interface iNoMeja{
-  id:number;
-  nomor:string;
-  
+export interface iNoMeja {
+  id: number;
+  nomor: string;
+}
+export interface iCategory {
+  id: number;
+  name: string;
+  icon: string;
 }
 
-export interface iOrder{
-  id:number;
-  uuid:string;
-  customer:string;
-  table_number:string;
-  total_price:number;
-  status:string;
-  createdAt:string;
-  updatedAt:string;
-  userId:number;
+export interface iOrder {
+  id: number;
+  uuid: string;
+  customer: string;
+  table_number: string;
+  total_price: number;
+  status: string;
+  createdAt: string;
+  updatedAt: string;
+  userId: number;
+  orderlist: OrderItem[];
 }
 
 export interface IPayMethod {
-  id : number,
-  tipe:string,
-  nama:string,
-  logo:string,
+  id: number;
+  tipe: string;
+  nama: string;
+  logo: string;
 }
 
 interface OrderItem {
@@ -81,7 +87,6 @@ interface PaymentOrder {
   paymentMethod: IPayMethod;
 }
 
-
 export interface OrderResponse {
   id: number;
   uuid: string;
@@ -98,4 +103,12 @@ export interface OrderResponse {
   orderlist: OrderItem[];
   nomor_meja: iNoMeja;
   PaymentOrder: PaymentOrder;
+}
+
+export interface IstOrder {
+  totalPesanan :number;
+  todayOrder: number;
+  totalOrderBulanIni: number;
+  sumTodayOrder: number;
+  sumMonthlyOrder: number;
 }

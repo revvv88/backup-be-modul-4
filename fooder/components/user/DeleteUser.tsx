@@ -73,13 +73,13 @@ const DeleteUser = ({ selectedUser }: { selectedUser: IUser }) => {
         </svg>
       </ButtonDanger>
       <Modal isShow={isShow} onClose={state => setIsShow(state)}>
-               <form onSubmit={handleSubmit}>
+               <form onSubmit={handleSubmit} className="font-poppins">
                    {/* modal header */}
-                   <div className="sticky top-0 bg-white px-5 pt-5 pb-3 shadow">
+                   <div className="sticky top-0 bg-white px-5 pt-5  ">
                        <div className="w-full flex items-center">
                            <div className="flex flex-col">
                                <strong className="font-bold text-2xl">Delete User</strong>
-                               <small className="text-slate-400 text-sm">Menus with existing transaction data cannot be deleted from this page.</small>
+                               {/* <small className="text-slate-400 text-sm">Menus with existing transaction data cannot be deleted from this page.</small> */}
                            </div>
                            <div className="ml-auto">
                                <button type="button" className="text-slate-400" onClick={() => setIsShow(false)}>
@@ -93,8 +93,8 @@ const DeleteUser = ({ selectedUser }: { selectedUser: IUser }) => {
                    {/* end modal header */}
 
                    {/* modal body */}
-                   <div className="p-5">
-                   Are you sure you want to delete this user {user.name}?
+                   <div className="px-5 py-2">
+                   Are you sure you want to delete this user <span className="font-bold capitalize">{user.name}?</span>
                    </div>
                    {/* end modal body */}
 

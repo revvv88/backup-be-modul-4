@@ -9,6 +9,8 @@ import { FormEvent, useState } from "react";
 import { toast, ToastContainer } from "react-toastify";
 import { ButtonPrimary, ButtonDanger } from "@/components/buttonComponents";
 import Modal from "@/components/modal";
+import Swal from 'sweetalert2'  
+import 'sweetalert2/src/sweetalert2.scss'
 
 const DeleteMenu = ({ selectedMenu }: { selectedMenu: IMenu }) => {
   const [isShow, setIsShow] = useState<boolean>(false);
@@ -21,12 +23,30 @@ const DeleteMenu = ({ selectedMenu }: { selectedMenu: IMenu }) => {
 
   const openModal = () => {
     setMenu({ ...selectedMenu });
-    setIsShow(true);
+    // setIsShow(true);
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, delete it!"
+    }).then((result) => {
+      if (result.isConfirmed) {
+        // Swal.fire({
+        //   title: "Deleted!",
+        //   text: "Your file has been deleted.",
+        //   icon: "success"
+        // });
+        handleSubmit()
+      }
+    });
   };
 
-  const handleSubmit = async (e: FormEvent) => {
+  const handleSubmit = async () => {
     try {
-      e.preventDefault();
+      // e.preventDefault();
       const url = `${BASE_API_URL}/menu/${selectedMenu.id}`;
       const { data } = await drop(url, TOKEN);
       if (data?.status) {

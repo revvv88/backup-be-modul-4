@@ -25,16 +25,17 @@ model PaymentOrder {
 }
 
 model menu {
-  id          Int           @id @default(autoincrement())
-  uuid        String        @unique(map: "Menu_uuid_key") @default("")
-  name        String        @default("")
-  price       Int           @default(0)
-  category    menu_category @default(FOOD)
-  picture     String        @default("")
-  description String        @default("") @db.Text
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @default(now())
+  id          Int         @id @default(autoincrement())
+  uuid        String      @unique(map: "Menu_uuid_key") @default("")
+  name        String      @default("")
+  price       Int         @default(0)
+  id_category Int
+  picture     String      @default("")
+  description String      @default("") @db.Text
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @default(now())
   orderlist   orderlist[]
+  category    Category    @relation(fields: [id_category], references: [id])
 }
 
 model nomormeja {
@@ -44,20 +45,20 @@ model nomormeja {
 }
 
 model order {
-  id           Int            @id @default(autoincrement())
-  uuid         String         @unique(map: "Order_uuid_key") @default("")
-  customer     String         @default("")
-  table_number Int            @default(0)
-  total_price  Int            @default(0)
-  status       order_status   @default(NEW)
-  createdAt    DateTime       @default(now())
-  updatedAt    DateTime       @default(now())
+  id           Int           @id @default(autoincrement())
+  uuid         String        @unique(map: "Order_uuid_key") @default("")
+  customer     String        @default("")
+  table_number Int           @default(0)
+  total_price  Int           @default(0)
+  status       order_status  @default(NEW)
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @default(now())
   userId       Int?
-  note         String?        @default("") @db.Text
-  user         user?          @relation(fields: [userId], references: [id], map: "Order_userId_fkey")
-  nomor_meja   nomormeja      @relation(fields: [table_number], references: [id], map: "Order_tableNumber_fkey")
+  note         String?       @default("") @db.Text
+  user         user?         @relation(fields: [userId], references: [id], map: "Order_userId_fkey")
+  nomor_meja   nomormeja     @relation(fields: [table_number], references: [id], map: "Order_tableNumber_fkey")
   orderlist    orderlist[]
-  dine_in      Int            @default(0)
+  dine_in      Int           @default(0)
   PaymentOrder PaymentOrder?
 
   @@index([userId], map: "Order_userId_fkey")
@@ -99,6 +100,15 @@ model user {
   order           order[]
 }
 
+model Category {
+  id        Int      @id @default(autoincrement())
+  name      String
+  icon      String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+  menu      menu[]
+}
+
 enum StatusPembayaran {
   BELUM_DIBAYAR
   LUNAS
@@ -110,12 +120,6 @@ enum paymentmethod_tipe {
   CASH
   VIRTUAL
   DEBIT
-}
-
-enum menu_category {
-  FOOD
-  DRINK
-  SNACK
 }
 
 enum order_status {

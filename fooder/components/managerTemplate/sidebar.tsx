@@ -5,6 +5,10 @@ import Logo from "../../public/restaurant.png";
 import Profile from "../../public/2.png";
 import { getCookie, removeCookie } from "@/lib/client-cookies";
 import { useRouter } from "next/navigation";
+import { BASE_API_URL, BASE_IMAGE_PROFILE } from "@/global";
+import { IUser } from "@/app/types";
+import { get } from "@/lib/api-bridge";
+import { getCookies } from "@/lib/server-cookies";
 
 type MenuType = {
   id: string;
@@ -20,6 +24,8 @@ type ManagerProp = {
   menuList: MenuType[];
 };
 
+
+
 const Sidebar = ({ children, id, title, menuList }: ManagerProp) => {
   const [isShow, setIsShow] = useState<boolean>(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -34,8 +40,11 @@ const Sidebar = ({ children, id, title, menuList }: ManagerProp) => {
     removeCookie("id");
     removeCookie("name");
     removeCookie("role");
+    removeCookie("image")
     router.push(`/login`);
   };
+  
+  
 
   return (
     <div className="w-full min-h-dvh bg-putihGaPutih font-poppins">
@@ -157,13 +166,14 @@ const Sidebar = ({ children, id, title, menuList }: ManagerProp) => {
         {/* user section */}
         <div className="w-full justify-center mt-10 mb-6 bg-primary text-slate-900 p-3 flex gap-2 items-center">
           <Image
-            src={Profile}
-            alt="Profile"
-            width={80}
-            height={80}
-            className=""
+            src={`${BASE_IMAGE_PROFILE}/${getCookie("image")}`}
+            alt="Profil"
+            width={40}
+            height={40}
           />
-          <div className="text-xl font-semibold capitalize">{getCookie("name")}</div>
+          <div className="text-xl font-semibold capitalize">
+            {getCookie("name")}
+          </div>
         </div>
         {/* end user section */}
 

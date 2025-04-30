@@ -20,7 +20,7 @@ const Modal = ({
       } justify-center items-center`}
       onClick={handleClickOutside}
     >
-      <div className="w-5/6 md:w-4/6 lg:w-3/6 overflow-auto max-h-full bg-white rounded-2xl">
+      <div className="w-1/3 overflow-auto max-h-full bg-white rounded-2xl">
         {children}
       </div>
     </div>

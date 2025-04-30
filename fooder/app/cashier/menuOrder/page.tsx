@@ -1,6 +1,6 @@
 "use client";
 
-import { IMenu, IChart, iNoMeja } from "@/app/types";
+import { IMenu, IChart, iNoMeja, iCategory } from "@/app/types";
 import { getCookies } from "../../../lib/server-cookies";
 import { BASE_API_URL, BASE_IMAGE_MENU } from "@/global";
 import { get, post } from "@/lib/api-bridge";
@@ -17,20 +17,9 @@ import DatePickerComponent from "@/components/dateTime";
 import { MdOutlineFastfood } from "react-icons/md";
 import { PiBowlFood } from "react-icons/pi";
 import { RiDrinks2Line } from "react-icons/ri";
+import DynamicIcon from "@/components/DynamicIcon";
+import Swal from "sweetalert2";
 
-const getMenu = async (search: string): Promise<IMenu[]> => {
-  try {
-    const TOKEN = (await getCookies("token")) ?? "";
-    const url = `${BASE_API_URL}/menu?search=${search}`;
-    const { data } = await get(url, TOKEN);
-    let result: IMenu[] = [];
-    if (data?.status) result = [...data.data];
-    return result;
-  } catch (error) {
-    console.log(error);
-    return [];
-  }
-};
 const getNoMeja = async (): Promise<iNoMeja[]> => {
   try {
     const TOKEN = (await getCookies("token")) ?? "";
@@ -44,12 +33,26 @@ const getNoMeja = async (): Promise<iNoMeja[]> => {
     return [];
   }
 };
+const GetDataCategory = async (): Promise<iCategory[]> => {
+  try {
+    const TOKEN = (await getCookies("token")) ?? "";
+    const url = `${BASE_API_URL}/category/items`;
+    const { data } = await get(url, TOKEN);
+    let result: iCategory[] = [];
+    if (data?.status) result = [...data.data];
+    return result;
+  } catch (error) {
+    console.log(error);
+    return [];
+  }
+};
 
 const MenuPage = () => {
   const searchParams = useSearchParams();
   const search = searchParams.get("search") || "";
   const [menu, setMenu] = useState<IMenu[]>([]);
   const [noMeja, setNoMeja] = useState<iNoMeja[]>([]);
+  const [categoryData, setCategoryData] = useState<iCategory[]>([]);
   const [orderMenu, setOrderMenu] = useState<IChart[]>([]);
   const [subTotal, setSubTotal] = useState<number>(0);
   const [total, setTotal] = useState<number>(0);
@@ -59,6 +62,53 @@ const MenuPage = () => {
   const [showNoteModal, setShowNoteModal] = useState(false);
   const [selectedPlace, setSelectedPlace] = useState<string>("0");
   const [orderNote, setOrderNote] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState<string>("all");
+  const [loading, setLoading] = useState(true);
+  const [totalMenus, setTotalMenus] = useState<string>("0");
+  const [formErrors, setFormErrors] = useState({
+    name: "",
+    table: "",
+    place: "",
+  });
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    const errors = {
+      name: customerName.trim() === "" ? "Customer name is required." : "",
+      table: selectedNoMeja === "0" ? "Please select a table." : "",
+      place: selectedPlace === "0" ? "Please select a place." : "",
+    };
+
+    setFormErrors(errors);
+
+    const hasErrors = Object.values(errors).some((err) => err !== "");
+    if (hasErrors) return;
+
+    console.log("Form valid, lanjut submit:", {
+      customerName,
+      selectedNoMeja,
+      selectedPlace,
+    });
+  };
+
+  const getMenu = async (
+    search: string,
+    category: string
+  ): Promise<IMenu[]> => {
+    try {
+      const TOKEN = (await getCookies("token")) ?? "";
+      const url = `${BASE_API_URL}/menu?search=${search}&category=${category}`;
+      const { data } = await get(url, TOKEN);
+      let result: IMenu[] = [];
+      if (data?.status) result = [...data.data];
+      setTotalMenus(data.totalMenus);
+      return result;
+    } catch (error) {
+      console.log(error);
+      return [];
+    }
+  };
 
   const router = useRouter();
   const handleChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
@@ -69,13 +119,17 @@ const MenuPage = () => {
   };
   useEffect(() => {
     const fetchData = async () => {
-      const result = await getMenu(search);
+      setLoading(true);
+      const result = await getMenu(search, selectedCategory);
       setMenu(result);
       const resultNoMeja = await getNoMeja();
       setNoMeja(resultNoMeja);
+      const resultDataCategory = await GetDataCategory();
+      setCategoryData(resultDataCategory);
+      setLoading(false);
     };
     fetchData();
-  }, [search]);
+  }, [search, selectedCategory]);
 
   const addOrder = ({ id, title, image, price }: any) => {
     setOrderMenu((prevOrders) => {
@@ -127,8 +181,31 @@ const MenuPage = () => {
 
   const checkoutOrder = async () => {
     try {
+      const errors = {
+        name: customerName.trim() === "" ? "Customer name is required." : "",
+        table: selectedNoMeja === "0" ? "Please select a table." : "",
+        place: selectedPlace === "0" ? "Please select a place." : "",
+      };
+
+      setFormErrors(errors);
+
+      const hasErrors = Object.values(errors).some((err) => err !== "");
+      if (hasErrors) {
+        const firstErrorMessage = Object.values(errors).find(
+          (err) => err !== ""
+        );
+
+        Swal.fire({
+          icon: "error",
+          title: "Oops...",
+          text: firstErrorMessage,
+        });
+        return;
+      }
+
       const TOKEN = (await getCookies("token")) ?? "";
       const url = `${BASE_API_URL}/order`;
+
       const payload = JSON.stringify({
         customer: customerName,
         table_number: selectedNoMeja,
@@ -171,6 +248,11 @@ const MenuPage = () => {
       maximumFractionDigits: 0,
     }).format(amount);
   };
+
+  const handleSelectCategory = (category: string) => {
+    setSelectedCategory(category);
+  };
+  let icon = "PiBowlFood";
 
   const category = (category: string): React.ReactNode => {
     if (category === "FOOD") {
@@ -219,29 +301,91 @@ const MenuPage = () => {
             datetime
           </div>
         </div> */}
-        <DatePickerComponent/>
+        <DatePickerComponent />
         {/* time end */}
 
         <div className="flex gap-4">
-          <div className="flex flex-col border-2 border-orange-500 w-32 h-32 px-4 py-2 rounded-lg my-5 bg-orange-500/5 justify-center">
-            <div className="bg-orange-500 p-2 w-max rounded-full mb-3">
-              <MdOutlineFastfood color="#ffffff" size={24} />
+          <div
+            className={`flex flex-col ${
+              selectedCategory === "all"
+                ? "border-2 border-orange-500"
+                : "bg-white"
+            } w-60 h-32 px-4 py-2 rounded-lg my-5 bg-orange-500/5 justify-center`}
+            onClick={() => handleSelectCategory("all")}
+          >
+            <div
+              className={`${
+                selectedCategory === "all" ? "bg-orange-500" : "bg-[#f7f7f7]"
+              } p-2 w-max rounded-full mb-3`}
+            >
+              {/* <MdOutlineFastfood color="#ffffff" size={24} /> */}
+              <DynamicIcon
+                iconName="MdOutlineFastfood"
+                size={28}
+                color={`${selectedCategory === "all" ? "#fff" : "#000"}`}
+              />
             </div>
-            <h1 className="text-orange-500">All Menu</h1>
-            <h3 className="text-hitamGaHitam/80 text-sm">
-              {menu.length} Items
-            </h3>
+            <h1
+              className={`${
+                selectedCategory === "all"
+                  ? "text-orange-500"
+                  : "text-hitamGaHitam"
+              }`}
+            >
+              All Menu
+            </h1>
+            <h3 className="text-hitamGaHitam/80 text-sm">{totalMenus} Items</h3>
           </div>
-          <div className="flex flex-col bg-white w-32 h-32 px-4 py-2 rounded-lg my-5 justify-center">
+          {categoryData?.map((item: any) => (
+            <div
+              className={`flex flex-col ${
+                selectedCategory === item.id
+                  ? "border-2 border-orange-500"
+                  : "bg-white"
+              } w-60 h-32 px-4 py-2 rounded-lg my-5 bg-orange-500/5 justify-center`}
+              onClick={() => handleSelectCategory(item.id)}
+              key={item.id}
+            >
+              <div
+                className={`${
+                  selectedCategory === item.id
+                    ? "bg-orange-500"
+                    : "bg-[#f7f7f7]"
+                } p-2 w-max rounded-full mb-3`}
+              >
+                {/* <MdOutlineFastfood color="#ffffff" size={24} /> */}
+                <DynamicIcon
+                  iconName={item.icon}
+                  size={24}
+                  color={`${selectedCategory === item.id ? "#fff" : "#000"}`}
+                />
+              </div>
+              <h1
+                className={`${
+                  selectedCategory === item.id
+                    ? "text-orange-500"
+                    : "text-hitamGaHitam"
+                }`}
+              >
+                {item.name}
+              </h1>
+              <h3 className="text-hitamGaHitam/80 text-sm">
+                {item.menuCount} Items
+              </h3>
+            </div>
+          ))}
+          {/* <div className="flex flex-col bg-white w-60 h-32 px-4 py-2 rounded-lg my-5 justify-center">
             <div className="bg-[#f7f7f7] p-2 w-max rounded-full mb-3">
               <PiBowlFood color="#000000" size={24} />
+              <DynamicIcon iconName="PiBowlFood" size={24} color="#000000" />
+
             </div>
             <h1 className="text-hitamGaHitam">Food</h1>
             <h3 className="text-hitamGaHitam/80 text-sm">
               {menu.length} Items
             </h3>
           </div>
-          <div className="flex flex-col bg-white w-32 h-32 px-4 py-2 rounded-lg my-5 justify-center">
+          <div className="flex flex-col bg-white w-60 h-32 px-4 py-2 rounded-lg my-5 justify-center">
             <div className="bg-[#f7f7f7] p-2 w-max rounded-full mb-3">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -258,17 +402,18 @@ const MenuPage = () => {
               {menu.length} Items
             </h3>
           </div>
-          <div className="flex flex-col bg-white w-32 h-32 px-4 py-2 rounded-lg my-5 justify-center">
+          <div className="flex flex-col bg-white w-60 h-32 px-4 py-2 rounded-lg my-5 justify-center">
             <div className="bg-[#f7f7f7] p-2 w-max rounded-full mb-3">
               <RiDrinks2Line color="#000000" size={24} />
+              <DynamicIcon iconName="RiDrinks2Line" size={24} color="#000000" />
+
             </div>
             <h1 className="text-hitamGaHitam">Drink</h1>
             <h3 className="text-hitamGaHitam/80 text-sm">
               {menu.length} Items
             </h3>
-          </div>
+          </div> */}
         </div>
-        
 
         <div className="flex justify-between items-center mb-4">
           <div className="flex items-center w-full flex-grow">
@@ -279,7 +424,9 @@ const MenuPage = () => {
         </div> */}
         </div>
 
-        {menu.length === 0 ? (
+        {loading ? (
+          <p>Loading.....</p>
+        ) : menu.length === 0 && !loading ? (
           <Alert>No data available</Alert>
         ) : (
           <div className=" flex flex-wrap justify-center gap-4">
@@ -289,7 +436,7 @@ const MenuPage = () => {
                   id={data.id}
                   image={data.picture}
                   title={data.name}
-                  cat={data.category}
+                  cat={data.category.name}
                   price={data.price}
                   orderClick={addOrder}
                 />
@@ -316,13 +463,16 @@ const MenuPage = () => {
                   <path d="M320-240h320v-80H320v80Zm0-160h320v-80H320v80ZM240-80q-33 0-56.5-23.5T160-160v-640q0-33 23.5-56.5T240-880h320l240 240v480q0 33-23.5 56.5T720-80H240Zm280-520v-200H240v640h480v-440H520ZM240-800v200-200 640-640Z" />
                 </svg>
               </div>
-              <div className="ml-20 w-40 flex flex-col justify-center">
-                <input
-                  placeholder="Customer Name"
-                  type="text"
-                  onChange={(e) => setCustomerName(e.target.value)}
-                  className="text-center border rounded-xl px-2 py-3"
-                />
+              <div className="ml-16 w-40 flex flex-col justify-center">
+                <form action="" onSubmit={handleSubmit}>
+                  <input
+                    placeholder="Customer Name"
+                    type="text"
+                    onChange={(e) => setCustomerName(e.target.value)}
+                    className="text-center border rounded-xl px-2 py-3"
+                  />
+
+                </form>
               </div>
             </div>
             <div className="flex justify-between my-4">
@@ -332,13 +482,14 @@ const MenuPage = () => {
                 onChange={handleChange}
                 value={selectedNoMeja}
               >
-                <option value="0">Select</option>
+                <option value="0">Select Table</option>
                 {noMeja.map((data, index) => (
                   <option value={data.id} key={index}>
                     Table {data.nomor}
                   </option>
                 ))}
               </select>
+              
               <select
                 className="bg-[#f7f7f7] py-2 px-3 my-2 rounded-full w-36"
                 onChange={handleChangePlace}
